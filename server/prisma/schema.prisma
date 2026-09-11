@@ -7,60 +7,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Problem {
-  id           Int       @id @default(autoincrement())
-  title        String
-  description  String    @db.Text
-  requirements String    @db.Text
-  difficulty   String
-  createdAt    DateTime  @default(now())
-  attempts     Attempt[]
-}
-
-model Attempt {
+model attempt {
   id          Int          @id @default(autoincrement())
   problemId   Int
-  problem     Problem      @relation(fields: [problemId], references: [id])
   learnerName String
   createdAt   DateTime     @default(now())
-  submissions Submission[]
+  problem     problem      @relation(fields: [problemId], references: [id], map: "Attempt_problemId_fkey")
+  submission  submission[]
+
+  @@index([problemId], map: "Attempt_problemId_fkey")
 }
 
-enum SubmissionStatus {
-  SUBMITTED
-  EVALUATING
-  COMPLETED
-  FAILED
-}
-
-model Submission {
-  id         Int               @id @default(autoincrement())
-  attemptId  Int
-  attempt    Attempt           @relation(fields: [attemptId], references: [id])
-  content    String            @db.Text
-  status     SubmissionStatus  @default(SUBMITTED)
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  evaluation Evaluation?
-}
-
-model Evaluation {
-  id            Int               @id @default(autoincrement())
-  submissionId  Int               @unique
-  submission    Submission        @relation(fields: [submissionId], references: [id])
-  evaluatorType String            // "rule_based" | "ai"
-  createdAt     DateTime          @default(now())
-  criteria      CriterionResult[]
-}
-
-model CriterionResult {
+model criterionresult {
   id           Int        @id @default(autoincrement())
   evaluationId Int
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
   criterion    String
   score        Int
   evidence     String     @db.Text
   concern      String     @db.Text
   suggestion   String     @db.Text
   confidence   Float
+  evaluation   evaluation @relation(fields: [evaluationId], references: [id], map: "CriterionResult_evaluationId_fkey")
+
+  @@index([evaluationId], map: "CriterionResult_evaluationId_fkey")
+}
+
+model evaluation {
+  id              Int               @id @default(autoincrement())
+  submissionId    Int               @unique(map: "Evaluation_submissionId_key")
+  evaluatorType   String
+  createdAt       DateTime          @default(now())
+  criterionresult criterionresult[]
+  submission      submission        @relation(fields: [submissionId], references: [id], map: "Evaluation_submissionId_fkey")
+}
+
+model problem {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String    @db.Text
+  requirements String    @db.Text
+  difficulty   String
+  createdAt    DateTime  @default(now())
+  attempt      attempt[]
+}
+
+model submission {
+  id         Int               @id @default(autoincrement())
+  attemptId  Int
+  content    String            @db.Text
+  status     submission_status @default(SUBMITTED)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime
+  evaluation evaluation?
+  attempt    attempt           @relation(fields: [attemptId], references: [id], map: "Submission_attemptId_fkey")
+
+  @@index([attemptId], map: "Submission_attemptId_fkey")
+}
+
+enum submission_status {
+  SUBMITTED
+  EVALUATING
+  COMPLETED
+  FAILED
 }

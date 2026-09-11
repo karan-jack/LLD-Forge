@@ -8,7 +8,11 @@ problemsRouter.get('/', async (req, res) => {
     const problems = await prisma.problem.findMany();
     res.json(problems);
   } catch (error: any) {
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('GET /api/problems failed:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: error?.message || 'Unknown error'
+    });
   }
 });
 
