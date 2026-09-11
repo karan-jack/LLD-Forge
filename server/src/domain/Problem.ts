@@ -1,0 +1,1 @@
+export interface Problem { id: number; title: string; description: string; requirements: string; difficulty: string; createdAt: Date; }

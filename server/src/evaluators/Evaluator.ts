@@ -1,0 +1,1 @@
+import { Submission } from '../domain/Submission'; import { Evaluation } from '../domain/Evaluation'; export interface Evaluator { evaluate(submission: Submission): Promise<Omit<Evaluation, 'id' | 'submissionId' | 'createdAt'>>; }

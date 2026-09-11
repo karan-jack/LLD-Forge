@@ -1,0 +1,2 @@
+import { CriterionResult } from './CriterionResult';
+export interface Evaluation { id: number; submissionId: number; evaluatorType: string; createdAt: Date; criteria?: Omit<CriterionResult, 'id' | 'evaluationId'>[]; }

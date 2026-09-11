@@ -1,0 +1,1 @@
+import { Submission } from './Submission'; export interface TextSubmission extends Submission { content: string; }

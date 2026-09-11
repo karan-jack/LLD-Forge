@@ -1,0 +1,1 @@
+export interface Attempt { id: number; problemId: number; learnerName: string; createdAt: Date; }

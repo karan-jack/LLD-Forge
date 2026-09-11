@@ -1,0 +1,1 @@
+export interface CriterionResult { id: number; evaluationId: number; criterion: string; score: number; evidence: string; concern: string; suggestion: string; confidence: number; }

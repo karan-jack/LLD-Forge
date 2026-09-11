@@ -1,0 +1,1 @@
+export interface Rubric { criteria: string[]; }

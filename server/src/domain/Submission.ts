@@ -1,0 +1,1 @@
+export interface Submission { id: number; attemptId: number; status: 'SUBMITTED' | 'EVALUATING' | 'COMPLETED' | 'FAILED'; createdAt: Date; updatedAt: Date; }

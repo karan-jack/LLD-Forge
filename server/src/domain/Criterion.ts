@@ -1,0 +1,1 @@
+export interface Criterion { name: string; description: string; }
