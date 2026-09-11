@@ -1,61 +1,122 @@
-# LLD Practice Platform
+# 🧠 LLD Forge
 
-A focused web application built for the **CipherSchool 2-Day Hiring Assignment**. The platform provides an end-to-end environment for software engineers to practice Low-Level Design (LLD) problems, submit structured design write-ups, and receive explainable, criterion-level feedback.
+### Practice. Design. Get feedback. Improve.
+
+**LLD Forge** is an interactive Low-Level Design (LLD) practice platform built for software engineers preparing for machine coding and object-oriented design interviews. Learners select a problem, draft a structured design, submit it for asynchronous multi-dimensional evaluation, inspect actionable feedback with concrete evidence citations, and iterate through a dedicated "Try Again" workflow.
 
 ---
 
-## Overview
+## 🌐 Live Deployment
 
-Low-Level Design practice is notoriously difficult to self-evaluate because LLD problems rarely have a single "correct" answer. Unlike algorithmic coding platforms that rely on binary unit tests, or system design platforms that focus on high-level distributed infrastructure, this platform focuses strictly on object-oriented domain modeling, responsibilities, abstractions, and trade-offs.
+The platform is deployed in production across two decoupled services connected via transparent edge proxying:
 
-### Who It Is For
-* Software engineering candidates preparing for Machine Coding and Object-Oriented Design (OOD) interview rounds.
-* Learners seeking actionable, multi-dimensional feedback on class responsibilities, coupling, cohesion, and extensibility.
+| Component | Role | Live Link |
+|---|---|---|
+| **Frontend** | Interactive Single-Page Application (React + Vite) | [🚀 Live Demo](https://lld-forge.vercel.app/) |
+| **Backend API** | REST API & Asynchronous Evaluation Service (Express + Prisma) | [🔌 API Root](https://lld-forge-ksu8.onrender.com) |
+| **Health Check** | Seeded LLD Problem Bank Verification Endpoint | [📦 Problems Endpoint](https://lld-forge-ksu8.onrender.com/api/problems) |
 
-### The Learner Journey
+> **Direct Access**: 
+> - **User-Facing App**: [https://lld-forge.vercel.app/](https://lld-forge.vercel.app/)
+> - **Backend API**: [https://lld-forge-ksu8.onrender.com](https://lld-forge-ksu8.onrender.com)
+> - **API Verification**: Verify live backend data by visiting [`/api/problems`](https://lld-forge-ksu8.onrender.com/api/problems), which returns the seeded LLD problems.
+
+---
+
+## ⚡ Core Features
+
+- 🧩 **Real-World LLD Problems**: 4 curated classic problems with functional requirements, constraints, and difficulty ratings.
+- ✍️ **Structured Design Submission**: Guided text-based design editor capturing requirements & assumptions, class responsibilities, relationships, trade-offs, and edge cases.
+- 🤖 **AI-Powered Semantic Evaluation**: Deep architectural analysis powered by Google Gemini, evaluating designs against an 8-dimension rubric.
+- 📐 **Deterministic Structural Validation**: Heuristic rule-based evaluator for fast input validation and offline testing.
+- 📊 **Explainable Rubric Feedback**: Criterion-level scoring (1–5) paired with direct evidence citations from the learner's text, identified concerns, actionable suggestions, and confidence scores.
+- ⏳ **Non-Blocking Asynchronous Processing**: Submissions return immediately (`SUBMITTED`) while background evaluators transition the state to `EVALUATING` and `COMPLETED` or `FAILED`.
+- 🔄 **Try Again Workflow**: Seamless one-click re-attempt loop directly from the feedback view to encourage rapid design iteration.
+- 📚 **Attempt History**: Complete longitudinal record of previous attempts, latest scores, and growth areas per learner without requiring a sign-up barrier.
+- 🔌 **Extensible Strategy Architecture**: Pluggable `Evaluator` interface allowing seamless addition of new evaluation models or human-in-the-loop reviewers.
+
+---
+
+## 🔄 Core User Journey
+
 ```text
-Choose Problem ──► Think / Design ──► Submit Design ──► Get Feedback ──► Review Rubric ──► Try Again
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│ 1. Choose       │  ──►  │ 2. Think &      │  ──►  │ 3. Submit       │
+│    Problem      │       │    Design       │       │    Design       │
+└─────────────────┘       └─────────────────┘       └─────────────────┘
+                                                             │
+                                                             ▼
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│ 6. Try          │  ◄──  │ 5. Review       │  ◄──  │ 4. Asynchronous │
+│    Again        │       │    Feedback     │       │    Evaluation   │
+└─────────────────┘       └─────────────────┘       └─────────────────┘
 ```
 
-The MVP provides a complete, runnable practice loop:
-1. **Browse Problems**: Choose from a bank of classic LLD problems with clear requirements.
-2. **Design Solution**: Draft a structured write-up covering requirements, responsibilities, relationships, trade-offs, and edge cases.
-3. **Submit & Evaluate**: Submit the design for automated evaluation via a pluggable Strategy (fast deterministic heuristics or AI-powered semantic analysis).
-4. **Review Feedback**: Inspect structured scores (1–5), evidence citations, identified concerns, and actionable suggestions across 8 standard rubric dimensions.
+1. **Choose Problem**: The learner browses available problems in the catalog and selects a challenge matching their target focus or difficulty level.
+2. **Think & Design**: The learner reviews detailed system requirements, boundary constraints, and drafts their solution across structured architectural sections.
+3. **Submit Design**: The learner submits their design. The API instantly registers the attempt and transitions the submission into a state-tracked lifecycle.
+4. **Asynchronous Evaluation**: The backend transitions the submission to `EVALUATING` and invokes the evaluator strategy (Rule-Based or Gemini AI) in the background without holding the client request open.
+5. **Review Feedback**: The client polls the submission status. Once `COMPLETED`, an interactive breakdown reveals scores, evidence quotes, identified concerns, and improvement advice across all 8 rubric criteria.
+6. **Try Again**: The learner clicks "Try Again" to immediately reopen their design workspace with the same attempt context to address the identified weak points.
 
 ---
 
-## Features
+## 📚 Seeded Problems
 
-* **LLD Problem Bank**: 4 seeded problems with clear requirements, constraints, and difficulty levels (*Parking Lot*, *Vending Machine*, *Elevator System*, *Rate Limiter*).
-* **Structured Design Submission**: Form-guided text submission capturing requirements/assumptions, class responsibilities, relationships & flows, trade-offs, and edge cases.
-* **Submission State Machine**: Submissions are persisted immediately with a defined lifecycle (`SUBMITTED → EVALUATING → COMPLETED / FAILED`), ensuring auditability and state recovery on failure.
-* **Pluggable Evaluation Strategies**:
-  * **Rule-Based Evaluator**: Fast, deterministic structural validation checking length, required sections, and heuristic keyword alignment.
-  * **AI Evaluator**: Deep semantic evaluation powered by Google Gemini (`gemini-3.5-flash`), providing nuanced analysis of abstractions and design trade-offs.
-* **8-Dimension Rubric Feedback**: Detailed evaluation broken down across:
-  1. *Requirement understanding*
-  2. *Class responsibilities*
-  3. *Coupling / cohesion*
-  4. *Encapsulation and interfaces*
-  5. *Appropriate use of abstraction / patterns*
-  6. *Extensibility*
-  7. *Edge cases and testability*
-  8. *Quality of explanation*
-* **Application-Side Validation**: AI output is strictly validated against a typed JSON schema before persistence to guarantee score bounds (1–5) and complete criterion coverage.
-* **Attempt History API**: Relational persistence tracking attempts, submissions, evaluations, and individual criterion results per learner (`GET /api/learners/:name/attempts`).
+LLD Forge includes four classic low-level design problems seeded in the production database:
+
+| Problem | Difficulty | Key Architectural Concepts Tested |
+|---|---|---|
+| **Parking Lot** | `Medium` | Multi-floor spot allocation, spot size hierarchy (Motorcycle/Car/Truck), ticket lifecycle, hourly fee computation strategies. |
+| **Vending Machine** | `Medium` | State pattern transitions (Idle, HasMoney, Dispensing, ReturnChange), inventory tracking, multi-denomination coin/cash handling. |
+| **Elevator System** | `Hard` | Dispatcher algorithms, direction-based scheduling (SCAN/LOOK), concurrent floor requests, internal vs. external call arbitration. |
+| **Rate Limiter** | `Hard` | Throttling algorithms (Token Bucket, Sliding Window Counter), per-client rate tracking, thread-safety, burst handling. |
 
 ---
 
-## Architecture
+## 🤖 AI Evaluation Engine
 
-The platform is designed as a clean, layered monolith adhering to Domain-Driven Design principles.
+The platform integrates **Google Gemini** to analyze submissions against eight architectural dimensions. Rather than collapsing feedback into an arbitrary single grade or comparing against a single rigid reference solution, the AI Evaluator assesses the structural and design merits of the submitted text.
+
+### The 8 Rubric Dimensions
+
+1. **Requirement understanding**: Captures core use cases, clarifies scope, and states sensible assumptions.
+2. **Class responsibilities**: Adheres to Single Responsibility Principle (SRP) with cohesive, well-defined class roles.
+3. **Coupling & cohesion**: Minimizes tight coupling between components while maintaining high internal cohesion.
+4. **Encapsulation & interfaces**: Hides internal state behind clean, well-abstracted interfaces.
+5. **Appropriate abstraction & patterns**: Applies design patterns (e.g., State, Strategy, Factory) where problems demand them, avoiding over-engineering.
+6. **Extensibility**: Permits additions (new vehicle types, new payment methods, new algorithms) with minimal code modification (Open/Closed Principle).
+7. **Edge cases & testability**: Identifies edge conditions (capacity limits, concurrent access, invalid inputs) and defines testable boundaries.
+8. **Quality of explanation**: Communicates rationale clearly with structured formatting and logical flow.
+
+### Structured Feedback Schema
+
+For every criterion, the AI returns a strictly validated JSON structure:
+
+```json
+{
+  "criterion": "Class responsibilities",
+  "score": 4,
+  "evidence": "ParkingLot delegates ticket generation to TicketDispenser and fee calculation to FeeCalculator.",
+  "concern": "SpotManager holds references to both spot allocation and payment validation.",
+  "suggestion": "Extract payment validation into a dedicated BillingService to maintain Single Responsibility.",
+  "confidence": 0.95
+}
+```
+
+- **Application-Side Guardrails**: The raw LLM response is parsed and checked against a strict domain schema. If scores exceed bounds (1–5), criteria are missing, or the JSON is malformed, the system catches the failure and safely marks the submission as `FAILED` rather than persisting corrupt state.
+- **Asynchronous Execution**: Model latency (typically 3–8 seconds) never blocks HTTP responses; the client receives a `201 SUBMITTED` status immediately and monitors progress via polling.
+
+---
+
+## 🏗️ Architecture & Engineering Design
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
 │                 React + Vite Frontend (SPA)                 │
+│              Hosted on Vercel (Edge CDN)                    │
 └──────────────────────────────┬──────────────────────────────┘
-                               │ HTTP / REST (via /api proxy)
+                               │ /api/* (Vercel Transparent Rewrite)
 ┌──────────────────────────────▼──────────────────────────────┐
 │                    Express REST API Layer                   │
 │         /api/problems  •  /api/attempts  •  /api/submissions│
@@ -79,368 +140,341 @@ The platform is designed as a clean, layered monolith adhering to Domain-Driven 
                │               └──────────────────────────────┘
 ┌──────────────▼──────────────────────────────────────────────┐
 │                    Prisma ORM Persistence                   │
+│               Relational Models & Transactions              │
 └──────────────────────────────┬──────────────────────────────┘
-                               │ SQL
+                               │ TLS / MySQL Protocol
 ┌──────────────────────────────▼──────────────────────────────┐
-│                        MySQL Database                       │
+│                   TiDB Cloud (Serverless)                   │
+│                  MySQL-Compatible Database                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Evaluator Strategy Pattern
-The `EvaluationService` interacts with evaluators through the `Evaluator` interface:
+### 1. Strategy Pattern for Evaluators
+
+The evaluation subsystem relies on a clean Strategy Pattern. The application service layer only depends on the `Evaluator` interface:
+
 ```typescript
 export interface Evaluator {
   evaluate(submission: Submission): Promise<Omit<Evaluation, 'id' | 'submissionId' | 'createdAt'>>;
 }
 ```
-Based on the `EVALUATOR_MODE` environment variable (`rule` or `ai`), the service instantiates either `RuleBasedEvaluator` or `AIEvaluator(new GeminiProvider())`.
 
-### Submission Lifecycle State Machine
-```text
-  [ Learner Submits ]
-           │
-           ▼
-     ┌───────────┐
-     │ SUBMITTED │ (Persisted immediately in DB)
-     └─────┬─────┘
-           │
-           ▼
-    ┌─────────────┐
-    │ EVALUATING  │ (Guard: Rejects duplicate concurrent evaluations)
-    └─────┬───────┘
-          │
-     ┌────┴────────────────────────┐
-     │                             │
- [Success]                     [Failure / Error]
-     │                             │
-     ▼                             ▼
-┌───────────┐                 ┌──────────┐
-│ COMPLETED │                 │  FAILED  │
-└───────────┘                 └──────────┘
-```
+Two concrete strategies are implemented:
+- **`RuleBasedEvaluator`**: Fast, deterministic heuristics that check character thresholds and section markers (used for offline development and instant guard checking).
+- **`AIEvaluator`**: Semantic analysis using `GeminiProvider` implementing the `LLMProvider` contract.
 
----
+Switching strategies is controlled via the `EVALUATOR_MODE` environment variable (`ai` or `rule`) without changing business logic.
 
-## Tech Stack
+### 2. Submission State Machine
 
-* **Frontend**: React 18, React Router v6, Vite, Vanilla CSS
-* **Backend**: Node.js, Express, TypeScript, `ts-node`
-* **Database & ORM**: MySQL 8.0+, Prisma ORM (Client & CLI v5.0.0)
-* **AI Provider**: Google GenAI SDK (`@google/genai`), Gemini 3.5 Flash (`gemini-3.5-flash`)
-* **Testing**: Vitest, Supertest
-
----
-
-## Project Structure
+Submissions follow a strict three-state lifecycle:
 
 ```text
-lld-practice-platform/
-├── client/                           # React + Vite frontend SPA
-│   ├── src/
-│   │   ├── api/                      # Fetch wrappers for backend endpoints
-│   │   ├── pages/                    # ProblemList, ProblemDetail, Attempt, Feedback, History
-│   │   ├── App.tsx                   # Route definitions
-│   │   ├── index.css                 # Global styling and design system tokens
-│   │   └── main.tsx                  # React entry point
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── vite.config.ts                # Configured with /api proxy to http://localhost:3000
-│
-├── server/                           # Node.js + Express backend
-│   ├── prisma/
-│   │   ├── schema.prisma             # MySQL domain schema
-│   │   └── seed.ts                   # Idempotent seed script for 4 LLD problems
-│   ├── src/
-│   │   ├── domain/                   # Problem, Attempt, Submission, TextSubmission, Evaluation, CriterionResult
-│   │   ├── evaluators/               # Evaluator interface, RuleBasedEvaluator, AIEvaluator
-│   │   ├── providers/                # LLMProvider interface, GeminiProvider (@google/genai)
-│   │   ├── routes/                   # problems.ts, attempts.ts, submissions.ts, learners.ts
-│   │   ├── rubric/                   # 8 fixed assignment rubric criteria
-│   │   ├── services/                 # AttemptService, EvaluationService
-│   │   ├── app.ts                    # Express application configuration
-│   │   ├── prisma.ts                 # PrismaClient singleton
-│   │   └── server.ts                 # Server entry point (starts on port 3000)
-│   ├── tests/
-│   │   ├── api.test.ts               # Integration tests covering REST endpoints & error handling
-│   │   ├── EvaluationService.test.ts # Strategy selection & state guard tests
-│   │   ├── AIEvaluator.test.ts       # AI response parsing, validation, and error tests
-│   │   └── RuleBasedEvaluator.test.ts# Deterministic rule & heuristic score tests
-│   ├── .env.example                  # Environment variable template
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── AI_USAGE.md                       # Comprehensive record of AI-assisted decisions and human corrections
-├── DESIGN_NOTE.md                    # In-depth architectural specification and trade-off analysis
-├── PLAN.md                           # Master implementation roadmap and execution checklist
-├── README.md                         # This file
-└── RESEARCH_NOTE.md                  # Learner problem research, competitor analysis, and architectural mapping
+      ┌───────────┐
+      │ SUBMITTED │
+      └─────┬─────┘
+            │ Worker begins evaluation
+            ▼
+      ┌───────────┐
+      │ EVALUATING│
+      └─────┬─────┘
+            │
+     ┌──────┴──────┐
+     ▼             ▼
+┌───────────┐ ┌────────┐
+│ COMPLETED │ │ FAILED │
+└───────────┘ └────────┘
 ```
 
----
+- **`SUBMITTED`**: Record created; HTTP request returns promptly to the client.
+- **`EVALUATING`**: Acquired by the evaluation runner; prevents concurrent redundant evaluations.
+- **`COMPLETED`**: Evaluation and 8 criterion results atomically committed inside a database transaction.
+- **`FAILED`**: Caught evaluation failures (e.g., API timeout or validation errors) transition cleanly, enabling user inspection and retry.
 
-## Prerequisites
+### 3. Extensible Submission Domain
 
-* **Node.js**: v18.0.0 or later (v20+ recommended)
-* **npm**: v9.0.0 or later
-* **MySQL**: v8.0 or later (running locally on port 3306 or hosted via Docker / cloud provider)
-* **Google Gemini API Key**: Required only if running in AI evaluation mode (`EVALUATOR_MODE=ai`)
-
----
-
-## Database Setup
-
-1. **Start MySQL** and create an empty database for the platform:
-   ```sql
-   CREATE DATABASE lld_platform;
-   ```
-
-2. **Configure Connection**:
-   In the `server/` directory, create a `.env` file from `.env.example`:
-   ```bash
-   cd server
-   cp .env.example .env
-   ```
-   Edit `.env` to specify your MySQL credentials:
-   ```env
-   DATABASE_URL="mysql://root:password@localhost:3306/lld_platform"
-   ```
-
-3. **Push Schema & Generate Prisma Client**:
-   Run the Prisma migration tool from the `server/` directory:
-   ```bash
-   npx prisma db push
-   ```
-
-4. **Seed the 4 LLD Problems**:
-   Run the idempotent seed script:
-   ```bash
-   npx prisma db seed
-   ```
-   *This seeds Parking Lot, Vending Machine, Elevator System, and Rate Limiter.*
+The domain defines `Submission` as an extensible base abstraction, with `TextSubmission` as the concrete MVP implementation. This architecture allows future submission formats (e.g., diagram ASTs, PlantUML scripts, or GitHub repository links) to be introduced without breaking the core evaluation pipeline.
 
 ---
 
-## Environment Variables
+## 🚀 Production Infrastructure & Routing
 
-All backend configuration is defined in `server/.env`. A template is provided in `server/.env.example`:
+### Hosting Breakdown
 
-| Variable | Required | Default | Description |
+| Tier | Service | Technology | Details |
 |---|---|---|---|
-| `DATABASE_URL` | **Yes** | `""` | MySQL connection string in the format `mysql://USER:PASSWORD@HOST:PORT/DATABASE`. |
-| `EVALUATOR_MODE` | No | `"rule"` | Determines evaluation strategy: `"rule"` (deterministic) or `"ai"` (Gemini). |
-| `GEMINI_API_KEY` | Conditional | `""` | Google AI Studio API key. Required only when `EVALUATOR_MODE=ai`. |
+| **Frontend** | [Vercel](https://vercel.com) | React 18, Vite, TypeScript | Global Edge CDN hosting static client bundle |
+| **Backend** | [Render](https://render.com) | Node.js 20, Express, TypeScript | Containerized web service running `ts-node` |
+| **Database** | [TiDB Cloud](https://tidbcloud.com) | MySQL 8.0 Compatible Serverless | Distributed relational storage with TLS enforcement |
+| **AI Engine** | [Google AI Studio](https://ai.google.dev) | Gemini API (`@google/genai`) | Server-side prompt execution & structured parsing |
 
-> [!NOTE]
-> The frontend requires no environment variables. The Vite development server automatically proxies requests from `/api` to `http://localhost:3000`.
+> **Security Note**:
+> - The browser never contacts the database or the Gemini API directly.
+> - All LLM requests and database queries originate strictly from the backend service on Render.
+
+### Vercel Edge API Routing
+
+The frontend utilizes **relative API paths** (`/api/problems`, `/api/attempts`, etc.). In production, Vercel proxies these requests to Render using [`client/vercel.json`](./client/vercel.json):
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://lld-forge-ksu8.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+- **Zero CORS Issues**: Browser requests remain same-origin with the Vercel domain; Vercel proxies requests server-to-server to Render.
+- **SPA Client Routing**: The fallback rewrite sends deep links (e.g., `/problems/1`, `/history`) to `/index.html` to allow React Router to resolve pages without 404s.
+- **Local Dev Proxy**: During local development, `client/vite.config.ts` proxies `/api` requests to `http://localhost:3000`.
 
 ---
 
-## Installation
+## 💻 Run Locally
 
-The repository consists of two packages (`server` and `client`). Install dependencies in both:
+### Prerequisites
+- **Node.js**: v18.0.0 or higher (v20+ recommended)
+- **npm**: v9.0.0 or higher
+- A running MySQL instance or TiDB Cloud cluster
 
-### 1. Backend Installation
+### 1. Clone the Repository
 ```bash
-cd server
+git clone https://github.com/karan-jack/LLD-Forge.git
+cd LLD-Forge
+```
+
+### 2. Install Frontend Dependencies
+```bash
+cd client
 npm install
 ```
 
-### 2. Frontend Installation
+### 3. Install Backend Dependencies
 ```bash
-cd ../client
+cd ../server
 npm install
 ```
 
----
+### 4. Configure Backend Environment Variables
+Create a `.env` file in the `server/` directory:
 
-## Running the Application
-
-To run the application locally, start the backend and frontend in separate terminals:
-
-### Terminal 1: Backend Server
 ```bash
-cd server
-npm start
+cd ../server
+cp .env.example .env   # or create server/.env manually
 ```
-*The backend starts at `http://localhost:3000`.*
 
-### Terminal 2: Frontend Client
+Populate `server/.env` with your credentials:
+```env
+PORT=3000
+DATABASE_URL="mysql://<user>:<password>@<host>:<port>/<database>?sslaccept=strict"
+GEMINI_API_KEY="your-gemini-api-key-here"
+EVALUATOR_MODE="ai"   # set to "rule" for offline deterministic evaluation
+```
+
+### 5. Generate Prisma Client
+```bash
+# Inside server/
+npx prisma generate
+```
+
+### 6. Apply Database Schema
+Push the schema to your target MySQL or TiDB instance:
+```bash
+# Inside server/
+npx prisma db push
+```
+
+### 7. Seed the Database
+Populate the 4 default LLD problems:
+```bash
+# Inside server/
+npx prisma db seed
+```
+
+### 8. Start Backend Service
+```bash
+# Inside server/
+npm run dev
+# Server will start on http://localhost:3000
+```
+
+### 9. Start Frontend Service
+In a separate terminal window:
 ```bash
 cd client
 npm run dev
+# Frontend will start on http://localhost:5173
 ```
-*The Vite development server starts at `http://localhost:5173`.*
 
-Open **`http://localhost:5173`** in your browser to interact with the platform.
-
----
-
-## Evaluator Modes
-
-The platform supports two selectable evaluation strategies configured via `EVALUATOR_MODE` in `server/.env`:
-
-### 1. Rule Mode (`EVALUATOR_MODE="rule"`)
-* **Behavior**: Evaluates submissions using `RuleBasedEvaluator`.
-* **Checks**:
-  * Minimum content length (rejects submissions under 50 characters).
-  * Presence of critical structural sections (requires explicit class responsibilities).
-  * Assigns heuristic baseline scores (1–4) across the 8 rubric dimensions based on section presence and depth.
-* **Benefits**: 100% deterministic, instant execution, zero network overhead, and requires no API keys.
-
-### 2. AI Mode (`EVALUATOR_MODE="ai"`)
-* **Behavior**: Evaluates submissions using `AIEvaluator` connected to Google Gemini 3.5 Flash via `GeminiProvider`.
-* **Prerequisites**: A valid `GEMINI_API_KEY` must be set in `server/.env`.
-* **Execution & Output Contract**:
-  * Formulates a structured prompt including problem title, description, requirements, and the candidate write-up.
-  * Requests JSON output constrained by `responseMimeType: "application/json"`.
-  * Enforces the 8 required rubric criteria with scores bounded between 1 and 5.
-  * Requires concrete evidence quotes grounded solely in the candidate's text.
-* **Error Handling & Failure State**:
-  * If the response is not valid JSON, has missing criteria, or contains out-of-bounds scores, an error is thrown.
-  * `EvaluationService` catches provider errors (e.g. rate limits, timeouts) and transitions the submission status to `FAILED`.
+Open [http://localhost:5173](http://localhost:5173) in your browser. All API requests made to `/api/*` will automatically proxy to `http://localhost:3000`.
 
 ---
 
-## Testing
+## 🗄️ Database Setup
 
-The automated test suite contains **24 tests** across 4 test suites. Tests are completely isolated from live Gemini API calls, require no API key, and consume zero quota.
+The backend uses **Prisma ORM** coupled with a MySQL-compatible database. The production deployment runs on **TiDB Cloud Serverless**.
 
-### Running the Test Suite
-From the `server/` directory, run:
+### Schema Definition
+The database schema is defined in [`server/prisma/schema.prisma`](./server/prisma/schema.prisma):
+- `problem`: Stores challenge title, requirements, description, and difficulty.
+- `attempt`: Tracks learner attempts per problem.
+- `submission`: Records submission text, status enum (`SUBMITTED`, `EVALUATING`, `COMPLETED`, `FAILED`), and timestamps.
+- `evaluation`: Stores evaluator metadata (`evaluatorType`, `createdAt`) linked 1:1 to a submission.
+- `criterionresult`: Stores criterion breakdown, scores (1–5), evidence citations, concerns, and suggestions linked to an evaluation.
+
+### Connecting to TiDB Cloud or Local MySQL
+For TiDB Cloud, SSL parameters must be included in your `DATABASE_URL`:
+```text
+DATABASE_URL="mysql://<user>.<prefix>:<password>@gateway01.<region>.prod.aws.tidbcloud.com:4000/<dbname>?sslaccept=strict"
+```
+For local MySQL installations:
+```text
+DATABASE_URL="mysql://root:password@localhost:3306/lld_forge"
+```
+
+---
+
+## 🧪 Testing & Verification
+
+The test suite is built with **Vitest** and **Supertest**, featuring unit tests for evaluators, end-to-end integration tests for Express routes, and mocked Gemini providers for deterministic testing.
+
+### Run All Backend Tests
 ```bash
 cd server
-npx vitest run --no-threads
-```
-*(Alternatively: `npm test -- --no-threads`)*
-
-> [!IMPORTANT]
-> The `--no-threads` flag ensures tests execute serially against the shared MySQL database, avoiding concurrent transaction race conditions.
-
-### Test Coverage Breakdown
-* **`tests/RuleBasedEvaluator.test.ts` (5 tests)**:
-  * Empty submission rejection.
-  * Below-threshold length rejection (<50 chars).
-  * Missing required sections rejection (missing class responsibilities).
-  * Full 8-criterion heuristic evaluation on complete submissions.
-  * Partial scoring when optional sections are omitted.
-* **`tests/AIEvaluator.test.ts` (5 tests)**:
-  * Parsing of valid structured JSON output into domain `CriterionResult` entities.
-  * Safe error handling on malformed non-JSON output.
-  * Safe error handling on invalid scores (<1 or >5).
-  * Safe error handling on missing rubric criteria.
-  * Propagation of provider network errors.
-* **`tests/EvaluationService.test.ts` (2 tests)**:
-  * Guard preventing concurrent re-evaluation of submissions in `EVALUATING` status.
-  * Evaluator strategy selection under `EVALUATOR_MODE=rule` with MySQL transaction verification.
-* **`tests/api.test.ts` (12 tests)**:
-  * `GET /api/problems` & `GET /api/problems/:id` (200 and 404 boundaries).
-  * `POST /api/attempts` (valid creation and 404 on unknown problem).
-  * `POST /api/attempts/:id/submissions` (empty content rejection and non-existent attempt rejection).
-  * End-to-end submission and synchronous evaluation lifecycle (`SUBMITTED → EVALUATING → COMPLETED`).
-  * Feedback retrieval (`GET /api/submissions/:id`).
-  * Evaluation failure lifecycle (`SUBMITTED → EVALUATING → FAILED`).
-  * Learner history retrieval (`GET /api/learners/:name/attempts`).
-
-### TypeScript Compilation Check
-Verify strict TypeScript compilation with zero errors:
-```bash
-cd server && npx tsc --noEmit
-cd ../client && npx tsc --noEmit
+npm test
 ```
 
----
+### Verified Test Results (24/24 Passing)
+```text
+ RUN  v0.34.6 D:/LLD Forge/server
 
-## API Overview
+ ✓ tests/RuleBasedEvaluator.test.ts  (5 tests)
+ ✓ tests/AIEvaluator.test.ts         (5 tests)
+ ✓ tests/EvaluationService.test.ts   (2 tests)
+ ✓ tests/api.test.ts                 (12 tests)
 
-All routes are prefixed with `/api` and return JSON.
+ Test Files  4 passed (4)
+      Tests  24 passed (24)
+   Duration  1.02s
+```
 
-| Method | Endpoint | Description | Status Codes |
-|---|---|---|---|
-| `GET` | `/api/problems` | List all available LLD problems. | `200`, `500` |
-| `GET` | `/api/problems/:id` | Fetch problem description, requirements, and difficulty. | `200`, `400`, `404`, `500` |
-| `POST` | `/api/attempts` | Create a new attempt for a problem (`{ problemId, learnerName }`). | `201`, `400`, `404`, `500` |
-| `POST` | `/api/attempts/:id/submissions` | Submit a design write-up (`{ content }`). Synchronously triggers evaluation and returns the updated submission. | `201`, `400`, `500` |
-| `GET` | `/api/submissions/:id` | Retrieve submission status, evaluator type, and 8 criterion results. | `200`, `400`, `404`, `500` |
-| `GET` | `/api/learners/:name/attempts` | Retrieve all past attempts and latest submission feedback for a learner. | `200`, `400`, `500` |
-
----
-
-## Evaluation Flow
-
-When a candidate clicks **Submit Design**:
-1. **Input Validation**: The route validates that `attemptId` exists and `content` is not empty.
-2. **Submission Creation**: `AttemptService` creates a `Submission` row with `status = "SUBMITTED"`.
-3. **Immediate Response**: The API immediately returns HTTP 201 with the created submission so the main submission request is never blocked by slow AI evaluation. The frontend navigates to `/feedback/:id` and begins polling status.
-4. **Asynchronous State Transition**: In the background, `EvaluationService` updates the submission to `status = "EVALUATING"`. An atomic concurrency guard prevents duplicate or concurrent evaluation executions.
-5. **Strategy Execution**:
-   * If `EVALUATOR_MODE=ai`: `AIEvaluator` builds the prompt, invokes Gemini, and parses the structured response.
-   * If `EVALUATOR_MODE=rule`: `RuleBasedEvaluator` executes deterministic syntax and keyword checks.
-6. **Persistence or Failure**:
-   * **On Success**: In a Prisma database transaction, an `Evaluation` record and 8 `CriterionResult` records are created, and `Submission.status` transitions to `COMPLETED`.
-   * **On Failure**: `EvaluationService` catches the exception, updates `Submission.status` to `FAILED`, and logs the error reason.
-7. **Client Feedback**: The frontend polls `GET /api/submissions/:id`, transitions from evaluating spinner to the completed 8-criterion feedback breakdown, or displays a retry banner on `FAILED`.
+### Test Coverage Highlights
+- **`RuleBasedEvaluator.test.ts`**: Verifies input rejection on empty text, missing responsibilities section, and scoring bounds.
+- **`AIEvaluator.test.ts`**: Validates JSON schema parsing, handles simulated network timeouts, and rejects missing rubric dimensions.
+- **`EvaluationService.test.ts`**: Verifies concurrency guards (preventing simultaneous re-evaluation) and evaluator mode switching.
+- **`api.test.ts`**: Full integration suite testing problem fetching, attempt creation, non-blocking submission polling, error flows, and learner history retrieval.
 
 ---
 
-## Documentation
+## 📁 Repository Structure
 
-The project includes four specialized engineering documents:
-
-* [**PLAN.md**](./PLAN.md): The foundational source of truth covering assignment requirements, tech stack decisions, MVP scope boundaries, and the execution roadmap.
-* [**DESIGN_NOTE.md**](./DESIGN_NOTE.md): Complete technical design note explaining layer boundaries, entity domain models, the Strategy pattern, rubric design, Change Tests A & B, failure modes, and architectural trade-offs.
-* [**RESEARCH_NOTE.md**](./RESEARCH_NOTE.md): Concise research note examining 6 existing platforms (AlgoMaster, Educative, LeetCode, Pramp, etc.), identifying key industry gaps, analyzing deterministic vs. AI evaluation trade-offs, and mapping research to architecture.
-* [**AI_USAGE.md**](./AI_USAGE.md): Transparent log detailing how AI was utilized as an engineering copilot, highlighting human corrections (SQLite to MySQL migration, template keyword sanitization, Gemini model debugging from 2.5/3.6 to 3.5 Flash, and documentation audits).
+```text
+LLD-Forge/
+├── client/                           # React + Vite Frontend
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── index.ts              # Centralized API client helper
+│   │   ├── pages/
+│   │   │   ├── ProblemList.tsx       # Problem catalog view
+│   │   │   ├── ProblemDetail.tsx     # Requirements & attempt launcher
+│   │   │   ├── Attempt.tsx           # Structured design write-up form
+│   │   │   ├── Feedback.tsx          # Interactive rubric evaluation view
+│   │   │   └── History.tsx           # Past attempts & weakness review
+│   │   ├── App.tsx                   # React Router definition
+│   │   └── main.tsx                  # Client bootstrap
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vercel.json                   # Production proxy rewrites & SPA routing
+│   └── vite.config.ts                # Local dev proxy configuration
+│
+├── server/                           # Express + TypeScript Backend
+│   ├── prisma/
+│   │   ├── schema.prisma             # Relational data models
+│   │   └── seed.ts                   # Seeds 4 initial LLD problems
+│   ├── src/
+│   │   ├── domain/                   # Core domain entities & interfaces
+│   │   │   ├── Problem.ts
+│   │   │   ├── Attempt.ts
+│   │   │   ├── Submission.ts
+│   │   │   ├── TextSubmission.ts
+│   │   │   ├── Evaluation.ts
+│   │   │   ├── Criterion.ts
+│   │   │   ├── CriterionResult.ts
+│   │   │   └── Rubric.ts
+│   │   ├── evaluators/               # Evaluator Strategy implementations
+│   │   │   ├── Evaluator.ts          # Strategy interface
+│   │   │   ├── RuleBasedEvaluator.ts # Deterministic heuristic evaluator
+│   │   │   └── AIEvaluator.ts        # Gemini-backed semantic evaluator
+│   │   ├── providers/                # External provider abstractions
+│   │   │   ├── LLMProvider.ts        # Provider contract
+│   │   │   └── GeminiProvider.ts     # Google Gemini SDK implementation
+│   │   ├── routes/                   # REST API controllers
+│   │   │   ├── problems.ts
+│   │   │   ├── attempts.ts
+│   │   │   ├── submissions.ts
+│   │   │   └── learners.ts
+│   │   ├── services/                 # Application service orchestration
+│   │   │   ├── AttemptService.ts
+│   │   │   └── EvaluationService.ts
+│   │   ├── app.ts                    # Express application setup
+│   │   ├── server.ts                 # HTTP server listener
+│   │   └── prisma.ts                 # Prisma Client singleton
+│   ├── tests/                        # Vitest test suite
+│   │   ├── RuleBasedEvaluator.test.ts
+│   │   ├── AIEvaluator.test.ts
+│   │   ├── EvaluationService.test.ts
+│   │   └── api.test.ts
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── AI_USAGE.md                       # Comprehensive log of AI tooling & decisions
+├── DESIGN_NOTE.md                    # In-depth architectural & domain design document
+├── PLAN.md                           # Original requirements, scope, & milestones
+└── RESEARCH_NOTE.md                  # Competitive analysis & rubric research findings
+```
 
 ---
 
-## Known Limitations / Scope Boundaries
+## 📚 Project Documentation
 
-To deliver a high-quality prototype within the 2-day constraint, the following items were deliberately kept out of scope:
-* **No Authentication / Session Management**: Learner identity is tracked via simple strings (e.g. `'Learner MVP'`) rather than OAuth/JWT infrastructure.
-* **Text Submission Format**: Focuses on structured markdown write-ups rather than real-time code compilation or diagram rendering. (Extensible via `TextSubmission extends Submission`).
-* **In-Process Asynchronous Evaluation**: Uses in-process non-blocking evaluation with frontend polling rather than heavyweight distributed message brokers (BullMQ/Redis/Kafka), keeping the architecture simple, robust, and aligned with 2-day assignment constraints.
-* **Focused Problem Bank**: Seeds 4 classic LLD problems rather than a large dynamic CMS.
-* **No Longitudinal Weakness Aggregation**: The database persists per-attempt `CriterionResult` records, establishing the foundation for longitudinal analytics, but automated cross-attempt trend dashboards are left for future iterations.
+The repository includes dedicated engineering notes documenting the research, architecture, and AI utilization behind the project:
 
----
-
-## Design Decisions
-
-* **Strategy Pattern for Evaluators**: Decouples the practice flow from the evaluation implementation, directly satisfying **Change Test B** (adding human evaluation or other LLM providers requires zero changes to the core submission pipeline).
-* **Abstract `Submission` Domain Base**: Models `Submission` as an extensible entity with `TextSubmission` as the initial specialization, directly satisfying **Change Test A** (adding diagram or code submissions requires no changes to `Attempt` or the lifecycle).
-* **Prisma with MySQL**: Relational integrity with foreign keys ensuring that evaluations and criterion results remain strictly linked to submissions and attempts.
-* **Application-Side Output Validation**: Mitigates LLM non-determinism by validating structure, score ranges, and criteria counts before database writes.
+- 📑 [**`DESIGN_NOTE.md`**](./DESIGN_NOTE.md): Complete domain modeling breakdown, evaluator design decisions, database schemas, and state machine transitions.
+- 🔬 [**`RESEARCH_NOTE.md`**](./RESEARCH_NOTE.md): Analysis of existing LLD tools, the limitation of single-reference grading, and the case for multi-dimensional evidence-based rubrics.
+- 🤖 [**`AI_USAGE.md`**](./AI_USAGE.md): Transparent account of AI assistance throughout the project, detailing human architectural corrections and verification steps.
+- 📋 [**`PLAN.md`**](./PLAN.md): Initial requirement analysis, grading weights, milestone checklist, and feature roadmaps.
 
 ---
 
-## Troubleshooting
+## ⚖️ Scope & Intentional MVP Trade-Offs
 
-### 1. MySQL Connection Issues (`P1001: Can't reach database server`)
-* Verify MySQL is running locally:
-  ```bash
-  mysqladmin -u root -p ping
-  ```
-* Ensure `DATABASE_URL` in `server/.env` uses the correct username, password, port (default `3306`), and database name.
+To maintain rigorous focus on domain modeling, rubric evaluation quality, and a reliable user journey, specific infrastructure components were deliberately omitted from this MVP:
 
-### 2. Gemini API Errors (`GEMINI_API_KEY environment variable is missing`)
-* If running in AI mode (`EVALUATOR_MODE="ai"`), verify `GEMINI_API_KEY` is set in `server/.env`.
-* If you do not have an API key, set `EVALUATOR_MODE="rule"` to use the deterministic evaluator with zero external dependencies.
-
-### 3. Gemini Rate Limiting (`HTTP 503 / 429 Demand Spike`)
-* Free-tier Gemini endpoints occasionally experience demand spikes. If a submission transitions to `FAILED`, check the server console for details. Re-submitting or switching to `EVALUATOR_MODE="rule"` will bypass API limits.
-
-### 4. Vitest Concurrency Issues
-* Always execute backend tests using `npx vitest run --no-threads` to prevent parallel tests from conflicting on shared database tables.
+- **No User Authentication**: Submissions use a lightweight demo learner identifier (`Learner MVP`). This removes sign-up friction while still persisting full attempt histories.
+- **No Distributed Queue (Redis/BullMQ/Kafka)**: In-process asynchronous evaluation promises keep operational overhead minimal while satisfying the non-blocking UX contract.
+- **No Diagram Visualizer**: The platform focuses strictly on structured text submissions. In real-world LLD interviews, candidates must clearly articulate responsibilities, trade-offs, and invariants in written form before sketching UML.
+- **Monolithic Architecture**: Rather than introducing microservices or complex distributed communication, a clean, modular monolith was selected to maximize cohesion and simplicity.
 
 ---
 
-## Submission Notes
+## 🔮 Future Extensibility
 
-To evaluate this submission end-to-end:
-1. Ensure MySQL is running and create database `lld_platform`.
-2. Configure `server/.env` using `server/.env.example` as a reference.
-3. In `server/`: run `npm install`, `npx prisma db push`, and `npx prisma db seed`.
-4. In `client/`: run `npm install`.
-5. Run the test suite: `cd server && npx vitest run --no-threads` (verifies all 24 tests pass).
-6. Start backend (`npm start` in `server/`) and frontend (`npm run dev` in `client/`).
-7. Visit `http://localhost:5173`, select a problem (e.g. *Parking Lot*), click *Start Attempt*, fill out the 5 structured sections, and submit to observe evaluation feedback.
+The domain architecture was engineered to accommodate key production enhancements:
+
+1. **Diagram & Code Submissions**: Extend the `Submission` base class to create `DiagramSubmission` (e.g., PlantUML or Mermaid AST) or `CodeSubmission` (Java/C++/TypeScript source).
+2. **Hybrid & Human Evaluation**: Introduce a `HumanEvaluator` or `CompositeEvaluator` strategy that combines deterministic linting, AI semantic analysis, and peer mentor review.
+3. **Longitudinal Weakness Analytics**: Query stored `CriterionResult` rows to identify recurring patterns (e.g., "Consistently scoring < 3 in Coupling & Cohesion") and suggest targeted follow-up problems.
+4. **Distributed Task Queue**: Extract `EvaluationService` calls into a background worker queue (e.g., Redis + BullMQ) to scale evaluation workloads horizontally under heavy traffic.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).
