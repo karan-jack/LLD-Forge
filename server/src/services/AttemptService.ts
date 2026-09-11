@@ -16,21 +16,41 @@ export class AttemptService {
   }
 
   async getAttemptHistory(learnerName: string) {
-    return await prisma.attempt.findMany({
+    const attempts = await prisma.attempt.findMany({
       where: { learnerName },
       include: {
         problem: true,
-        submissions: {
+        submission: {
           orderBy: { createdAt: 'desc' },
           take: 1,
           include: {
             evaluation: {
-              include: { criteria: true }
+              include: { criterionresult: true }
             }
           }
         }
       },
       orderBy: { createdAt: 'desc' }
+    });
+
+    return attempts.map(attempt => {
+      const submissions = attempt.submission.map(sub => {
+        if (sub.evaluation) {
+          return {
+            ...sub,
+            evaluation: {
+              ...sub.evaluation,
+              criteria: sub.evaluation.criterionresult
+            }
+          };
+        }
+        return sub;
+      });
+
+      return {
+        ...attempt,
+        submissions
+      };
     });
   }
 
@@ -48,7 +68,8 @@ export class AttemptService {
       data: {
         attemptId,
         content,
-        status: 'SUBMITTED'
+        status: 'SUBMITTED',
+        updatedAt: new Date()
       }
     });
   }
@@ -59,7 +80,7 @@ export class AttemptService {
       include: {
         evaluation: {
           include: {
-            criteria: true
+            criterionresult: true
           }
         }
       }
@@ -67,6 +88,16 @@ export class AttemptService {
 
     if (!submission) {
       throw new Error('Submission not found');
+    }
+
+    if (submission.evaluation) {
+      return {
+        ...submission,
+        evaluation: {
+          ...submission.evaluation,
+          criteria: submission.evaluation.criterionresult
+        }
+      };
     }
 
     return submission;

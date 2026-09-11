@@ -49,7 +49,7 @@ describe('API & Domain Integration Tests', () => {
 
   afterAll(async () => {
     // Cleanup created attempts and submissions for this test
-    await prisma.criterionResult.deleteMany({});
+    await prisma.criterionresult.deleteMany({});
     await prisma.evaluation.deleteMany({});
     await prisma.submission.deleteMany({});
     await prisma.attempt.deleteMany({ where: { learnerName: 'TestLearner' }});

@@ -62,7 +62,7 @@ export class EvaluationService {
           data: {
             submissionId: submission.id,
             evaluatorType: evalResult.evaluatorType,
-            criteria: {
+            criterionresult: {
               create: evalResult.criteria?.map(c => ({
                 criterion: c.criterion,
                 score: c.score,

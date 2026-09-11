@@ -19,7 +19,7 @@ describe('EvaluationService', () => {
   });
 
   afterAll(async () => {
-    await prisma.criterionResult.deleteMany({});
+    await prisma.criterionresult.deleteMany({});
     await prisma.evaluation.deleteMany({});
     await prisma.submission.deleteMany({});
     await prisma.attempt.deleteMany({ where: { learnerName: 'EvalTestLearner' }});
@@ -31,7 +31,8 @@ describe('EvaluationService', () => {
       data: {
         attemptId,
         content: 'Some test content for evaluating guard',
-        status: 'EVALUATING'
+        status: 'EVALUATING',
+        updatedAt: new Date()
       }
     });
 
@@ -44,7 +45,8 @@ describe('EvaluationService', () => {
       data: {
         attemptId,
         content: 'This has class responsibilities. Requirements met. Edge cases considered. ' + 'a'.repeat(500),
-        status: 'SUBMITTED'
+        status: 'SUBMITTED',
+        updatedAt: new Date()
       }
     });
 
@@ -57,12 +59,12 @@ describe('EvaluationService', () => {
 
       const evaluation = await prisma.evaluation.findUnique({
         where: { submissionId: submission.id },
-        include: { criteria: true }
+        include: { criterionresult: true }
       });
 
       expect(evaluation).toBeDefined();
       expect(evaluation?.evaluatorType).toBe('rule_based');
-      expect(evaluation?.criteria.length).toBe(8);
+      expect(evaluation?.criterionresult.length).toBe(8);
 
       const updatedSub = await prisma.submission.findUnique({ where: { id: submission.id } });
       expect(updatedSub?.status).toBe('COMPLETED');
